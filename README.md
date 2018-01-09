@@ -8,3 +8,4 @@ An example of a [good commit message](https://github.com/erlang/otp/wiki/writing
 
 ## Ideas
 1. Webapp that helps diners split the bill. Preferably a static page, users add dishes one by one, indicating who ordered that dish. Settings such as session and dish %-multiplier (for GSTs, discount) available. Requires javascript, html, CSS know-how. Perhaps sessions may be stored in cookies.
+2. Inspired by commitbait (https://github.com/yangshun/commitbait). Script that takes a commit message and contextually makes it clickbait-y (e.g "add Home controlleer" >> "You'll never believe what adding a Home controller did!")

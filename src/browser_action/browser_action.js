@@ -54,6 +54,7 @@ function addTabCat(tab, state) {
         var replaceEntry = JSON.parse(JSON.stringify(tabMap));
         replaceEntry[tab.id] = {};
         replaceEntry[tab.id]["cat"] = state;
+        replaceEntry[tab.id]["id"] = tab.id;
         chrome.storage.local.set({ 'tabMap' : replaceEntry });
     }, 500);
 }
@@ -98,21 +99,18 @@ function toggleTabMapPins() {
                         console.log(item.state);
                         state = item.state;
                     });
-    
-    setTimeout(function () {
-        for (tab in tabMap) {
-            // Unpin all in the current state
-            if (tab["cat"] == state) {
-                chrome.tabs.update(parseInt(tab), 
+    setTimeout(function() {
+        for (var tab in tabMap) {
+            if (tabMap[tab]["cat"] == state) {
+                chrome.tabs.update(tabMap[tab]["id"], 
                                    {'pinned': false },
                                    function() {});
             } else {
-                console.log(tab["cat"]);
-                chrome.tabs.update(parseInt(tab), 
+                chrome.tabs.update(tabMap[tab]["id"], 
                                    {'pinned': true },
                                    function() {});
             }
-        };
+        }
     }, 500);
 }
 

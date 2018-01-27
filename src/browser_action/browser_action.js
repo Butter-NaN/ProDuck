@@ -32,38 +32,29 @@ function initHtmlValues(key, id_attr) {
     );
 }
 
+// add the current Tab to tabMap with addTabCat helper func (below)
+function addActiveTabAs(state) {
+    chrome.tabs.query( { 'active': true, 'currentWindow': true },
+        function(tabs) {
+            console.log('addActiveTabAs.anon: ' + JSON.stringify(tabs[0]));
+            addTabCat(tabs[0], state);
+        }
+    );
+}
+
 // add the given Tab to tabMap in chrome.storage
 //   with key-values "cat": state and "id": id
-//   i.e. tabMap{ tab.id:num : { "cat": state:str, "id": id:num }, ...}
+//   i.e. tabMap{ tab.id:str : { "cat": state:str, "id": id:num }, ... }
 function addTabCat(tab, state) {
     chrome.storage.local.get('tabMap',
         function(item) { 
             var tabMap = item.tabMap; 
             // TODO: id neccessary?
-            tabMap[tab.id] = { "cat": state, "id": tab.id };
+            // key must be string, otherwise messy
+            tabMap[String(tab.id)] = { "cat": state, "id": tab.id };
             chrome.storage.local.set( { 'tabMap': tabMap } );
         }
     );
-}
-
-// Change/add the cat of the current tab to work
-function addCurrentToWork() {
-    chrome.tabs.query( { 'active': true,
-                         'currentWindow': true },
-                       function(tabs) {
-                           console.log(tabs[0].id);
-                           addTabCat(tabs[0], "work");
-                       });
-}
-
-// Change/add the cat of the current tab to rest
-function addCurrentToRest() {
-    chrome.tabs.query( { 'active': true,
-                         'currentWindow': true },
-                       function(tabs) {
-                           console.log(tabs[0].id);
-                           addTabCat(tabs[0], "rest");
-                       });
 }
 
 /**
@@ -101,7 +92,6 @@ function toggleTabMapPins() {
     }, 500);
 }
 
-
 ///////////////
 // EXECUTION //
 ///////////////
@@ -137,29 +127,17 @@ $(document).ready(
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(
             function() {
-                // retrieve current state
-                var state;
                 chrome.storage.local.get('state',
-                function(item) {
-                    console.log(item.state);
-                    state = item.state;
-                    console.log(state);
-                });
-
-                setTimeout(function() {    
-                    if (state == "work") {
-                        addCurrentToWork();
-                    } else {
-                        addCurrentToRest();
-                    }
-                }, 500);
+                    function(item) {
+                        state = item.state;
+                        addActiveTabAs(state);
+                    });
             }
         );
         // add onclick for button#runMinimizerButton
         $("#runMinimizerButton").click(
             toggleTabMapPins
         );
-        
 
         // initialise state of spans
         initHtmlValues('state', '#browserActionState');

@@ -55,7 +55,7 @@ function addTabCat(tab, state) {
         replaceEntry[tab.id] = [];
         replaceEntry[tab.id][0] = state;
         chrome.storage.local.set({ 'tabMap' : replaceEntry });
-    }, 2000);
+    }, 500);
 }
 
 // Change/add the cat of the current tab to work
@@ -112,7 +112,7 @@ function toggleTabMapPins() {
                                    function() {});
             }
         };
-    }, 2000);
+    }, 500);
 }
 
 
@@ -150,7 +150,24 @@ $(document).ready(
         );
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(
-            addCurrentToWork
+            function() {
+                // retrieve current state
+                var state;
+                chrome.storage.local.get('state',
+                function(item) {
+                    console.log(item.state);
+                    state = item.state;
+                    console.log(state);
+                });
+
+                setTimeout(function() {    
+                    if (state == "work") {
+                        addCurrentToWork();
+                    } else {
+                        addCurrentToRest();
+                    }
+                }, 500);
+            }
         );
         // add onclick for button#runMinimizerButton
         $("#runMinimizerButton").click(

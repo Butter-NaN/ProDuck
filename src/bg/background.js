@@ -5,6 +5,17 @@ chrome.storage.local.set({
         'tabMap': {}
 });
 
+function debug() {
+    a = console.log;
+    chrome.storage.local.get(null,
+        function(item) {
+            a("========= DEBUG INFO =========");
+            a("may you find your answers here");
+            a(JSON.stringify(item, null, 2));
+        }
+    );
+}
+
 // TODO: are these sample code useful to us?
 // var settings = new Store("settings", {
 //     "sample_setting": "This is how you use Store.js to remember values"

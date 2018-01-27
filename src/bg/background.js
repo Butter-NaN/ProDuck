@@ -5,13 +5,14 @@ chrome.storage.local.set({
         'tabMap': {}
 });
 
-function debug() {
-    a = console.log;
+function debug_storage() {
     chrome.storage.local.get(null,
         function(item) {
-            a("========= DEBUG INFO =========");
-            a("may you find your answers here");
-            a(JSON.stringify(item, null, 2));
+            var l1 = "vvvvvvvvv DEBUG INFO vvvvvvvvv";
+            var l2 = "may you find your answers here";
+            var l3 = JSON.stringify(item, null, 2);
+            var l4 = "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+            console.log (l1+'\n'+l2+'\n'+l3+'\n'+l4);
         }
     );
 }

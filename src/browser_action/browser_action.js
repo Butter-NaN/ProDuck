@@ -49,47 +49,38 @@ function addTabCat(tab, state) {
     chrome.storage.local.get('tabMap',
         function(item) { 
             var tabMap = item.tabMap; 
-            // TODO: id neccessary?
             // key must be string, otherwise messy
-            tabMap[String(tab.id)] = { "cat": state, "id": tab.id };
+            tabMap[String(tab.id)] = { "cat": state };
             chrome.storage.local.set( { 'tabMap': tabMap } );
         }
     );
 }
 
-/**
- * Tab Pin handling
- */
-
-// Go through the tabMap and toggle all pins
+// onclick function for #runMinimizerButton
 function toggleTabMapPins() {
-    // Retrieve the tabMap
-    var tabMap;
-    chrome.storage.local.get('tabMap',
-                    function(item) {
-                        console.log(item.tabMap);
-                        tabMap = item.tabMap;
-                    });
-    // retrieve current state
-    var state;
-    chrome.storage.local.get('state',
-                    function(item) {
-                        console.log(item.state);
-                        state = item.state;
-                    });
-    setTimeout(function() {
-        for (var tab in tabMap) {
-            if (tabMap[tab]["cat"] == state) {
-                chrome.tabs.update(tabMap[tab]["id"], 
-                                   {'pinned': false },
-                                   function() {});
-            } else {
-                chrome.tabs.update(tabMap[tab]["id"], 
-                                   {'pinned': true },
-                                   function() {});
+    chrome.storage.local.get(['tabMap', 'state'],
+        function(item) {
+            var tabMap = item.tabMap;
+            var state = item.state;
+
+            for (var tabId in tabMap) {
+                console.log('  tabId: ' + typeof(tabId) + '/' + tabId);
+                console.log('  tabMap: ' + JSON.stringify(tabMap));
+                console.log("  tabMap.tabId: " + JSON.stringify(tabMap.tabId));
+                console.log("  tabMap['tabId']: " + JSON.stringify(tabMap['tabId']));
+                // note: tabMap.tabId.cat fails
+                if (tabMap[tabId].cat == state) {
+                    chrome.tabs.update(
+                        Number(tabId), { 'pinned': false }, function() {}
+                    );
+                } else {
+                    chrome.tabs.update(
+                        Number(tabId), { 'pinned': true }, function() {}
+                    );
+                }
             }
         }
-    }, 500);
+    );
 }
 
 ///////////////
@@ -135,9 +126,7 @@ $(document).ready(
             }
         );
         // add onclick for button#runMinimizerButton
-        $("#runMinimizerButton").click(
-            toggleTabMapPins
-        );
+        $("#runMinimizerButton").click(toggleTabMapPins);
 
         // initialise state of spans
         initHtmlValues('state', '#browserActionState');

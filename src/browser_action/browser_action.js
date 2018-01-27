@@ -102,11 +102,12 @@ function toggleTabMapPins() {
     setTimeout(function () {
         for (tab in tabMap) {
             // Unpin all in the current state
-            if (tab[0] == state) {
+            if (tab["cat"] == state) {
                 chrome.tabs.update(parseInt(tab), 
                                    {'pinned': false },
                                    function() {});
             } else {
+                console.log(tab["cat"]);
                 chrome.tabs.update(parseInt(tab), 
                                    {'pinned': true },
                                    function() {});

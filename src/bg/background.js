@@ -1,10 +1,5 @@
 chrome.storage.local.set( { 'state': 'rest' } );  // default
 
-chrome.storage.onChanged.addListener(
-    function(changes, areaName) {
-        alert(String(changes) + String(areaName));
-    }
-);
 
 // TODO: are these sample code useful to us?
 // var settings = new Store("settings", {

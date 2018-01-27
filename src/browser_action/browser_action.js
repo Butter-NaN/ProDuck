@@ -2,11 +2,7 @@
 // DEFINITIONS //
 /////////////////
 
-/**
- * State functions
- */
-
-// generates onclick function for
+// generate onclick function for
 //   - button#toggleStateButton
 //   - button#toggleTrackButton
 function toggleCallbackFactory(key, val1, val2) {
@@ -16,14 +12,14 @@ function toggleCallbackFactory(key, val1, val2) {
             function(item) {
                 var lastValue = item[key];
                 var nextValue = lastValue == val1 ? val2 : val1;
-                prep = {}; prep[key] = nextValue;
+                var prep = {}; prep[key] = nextValue;
                 chrome.storage.local.set(prep);
             }
         );
     }
 }
 
-// initialises value of key in chrome.storage to html of id_attr
+// initialise value of key in chrome.storage to html of id_attr
 //   - span#browserActionState
 //   - span#browserActionTrack
 function initHtmlValues(key, id_attr) {
@@ -34,29 +30,18 @@ function initHtmlValues(key, id_attr) {
     );
 }
 
-/**
- * Tab map handling
- */
-
-// Adds the tab into the tabMap with stage stage,
-// stored as [tabId, cat(egory)]
-// Will replace if the tab already has a cat.
+// add the given Tab to tabMap in chrome.storage
+//   with key-values "cat": state and "id": id
+//   i.e. tabMap{ tab.id:num : { "cat": state:str, "id": id:num }, ...}
 function addTabCat(tab, state) {
-    // Access the tabMap
-    var tabMap;
     chrome.storage.local.get('tabMap',
-                    function(item) {
-                        console.log(item.tabMap);
-                        tabMap = item.tabMap;
-                    });
-    console.log(JSON.stringify(tabMap));
-    setTimeout(function() {
-        var replaceEntry = JSON.parse(JSON.stringify(tabMap));
-        replaceEntry[tab.id] = {};
-        replaceEntry[tab.id]["cat"] = state;
-        replaceEntry[tab.id]["id"] = tab.id;
-        chrome.storage.local.set({ 'tabMap' : replaceEntry });
-    }, 500);
+        function(item) { 
+            var tabMap = item.tabMap; 
+            // TODO: id neccessary?
+            tabMap[tab.id] = { "cat": state, "id": tab.id };
+            chrome.storage.local.set( { 'tabMap': tabMap } );
+        }
+    );
 }
 
 // Change/add the cat of the current tab to work

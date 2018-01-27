@@ -25,7 +25,9 @@ function toggleCallbackFactory(key, val1, val2) {
 function initHtmlValues(key, id_attr) {
     chrome.storage.local.get(key,
         function(item) {
-            $(id_attr).html(item[key]);
+            // tenary fixes boolean false casting as empty string ''
+            var initValue = item[key] === false ? 'false' : item[key]
+            $(id_attr).html(initValue);
         }
     );
 }

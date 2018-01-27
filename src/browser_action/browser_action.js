@@ -41,7 +41,7 @@ function initHtmlValues(key, id_attr) {
 // Adds the tab into the tabMap with stage stage,
 // stored as [tabId, cat(egory)]
 // Will replace if the tab already has a cat.
-function addTabCat(tab, stage) {
+function addTabCat(tab, state) {
     // Access the tabMap
     var tabMap;
     chrome.storage.local.get('tabMap',
@@ -49,9 +49,13 @@ function addTabCat(tab, stage) {
                         console.log(item.tabMap);
                         tabMap = item.tabMap;
                     });
-    // Use the tab.id as a key to store the stage
-    tabMap[tab.id] = [];
-    tabMap[tab.id][0] = stage;
+    console.log(JSON.stringify(tabMap));
+    setTimeout(function() {
+        var replaceEntry = JSON.parse(JSON.stringify(tabMap));
+        replaceEntry[tab.id] = [];
+        replaceEntry[tab.id][0] = state;
+        chrome.storage.local.set({ 'tabMap' : replaceEntry });
+    }, 2000);
 }
 
 // Change/add the cat of the current tab to work
@@ -94,19 +98,21 @@ function toggleTabMapPins() {
                         console.log(item.state);
                         state = item.state;
                     });
-
-    for (tab in tabMap) {
-        // Unpin all in the current state
-        if (tab[0] === state) {
-            chrome.tabs.update(tab, 
-                               {'pinned': false },
-                               function() {});
-        } else {
-            chrome.tabs.update(tab, 
-                               {'pinned': true },
-                               function() {});
-        }
-    };
+    
+    setTimeout(function () {
+        for (tab in tabMap) {
+            // Unpin all in the current state
+            if (tab[0] === state) {
+                chrome.tabs.update(parseInt(tab), 
+                                   {'pinned': false },
+                                   function() {});
+            } else {
+                chrome.tabs.update(parseInt(tab), 
+                                   {'pinned': true },
+                                   function() {});
+            }
+        };
+    }, 2000);
 }
 
 
@@ -141,6 +147,14 @@ $(document).ready(
         // add onclick for button#toggleTrackButton
         $("#toggleTrackButton").click(
             toggleCallbackFactory("track", true, false)
+        );
+        // add onclick for button#addTabMapButton
+        $("#addTabMapButon").click(
+            addCurrentToWork
+        );
+        // add onclick for button#runMinimizerButton
+        $("#runMinimizerButton").click(
+            toggleTabMapPins
         );
         
 

@@ -1,21 +1,16 @@
-function get_state() {
-    console.log('get_state');
-    return chrome.storage.local.get(
-        'state', function(item) { 
-            console.log('get_state#anon: ' + JSON.stringify(item));
-            return item.state; 
+function toggle_state_callback() {
+    chrome.storage.local.get('state', 
+        function(item) { 
+            var last_state = item.state;
+            var next_state = last_state == 'rest' ? 'work' : 'rest';
+            console.log(
+                'toggle_state_callback#(last_state, next_state): ' + 
+                '('  + last_state +
+                ', ' + next_state + ')'
+            );
+            chrome.storage.local.set( { 'state': next_state } );
         }
     );
-}
-
-function toggle_state(last_state) {
-    console.log('toggle_state: ' + last_state);
-    return last_state == 'rest' ? 'work' : 'rest';
-}
-
-function toggle_state_callback() {
-    console.log('toggle_state_callback');
-    toggle_state(get_state());
 }
 
 // action for button#toggleStateButton

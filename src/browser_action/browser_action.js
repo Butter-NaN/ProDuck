@@ -1,25 +1,52 @@
-// action for button#toggleStateButton
-function toggle_state_callback() {
-    chrome.storage.local.get('state', 
-        function(item) { 
-            var last_state = item.state;
-            var next_state = last_state == 'rest' ? 'work' : 'rest';
-            console.log(
-                'toggle_state_callback#(last_state, next_state): ' + 
-                '('  + last_state +
-                ', ' + next_state + ')'
-            );
-            chrome.storage.local.set( { 'state': next_state } );
+/////////////////
+// DEFINITIONS //
+/////////////////
+
+// generates onclick function for
+//   - button#toggleStateButton
+//   - button#toggleTrackButton
+function toggleCallbackFactory(key, val1, val2) {
+    // string, any, any -> function
+    return function() { 
+        chrome.storage.local.get(key,
+            function(item) {
+                var lastValue = item[key];
+                var nextValue = lastValue == val1 ? val2 : val1;
+                prep = {}; prep[key] = nextValue;
+                chrome.storage.local.set(prep);
+            }
+        );
+    }
+}
+
+// initialises value of key in chrome.storage to html of id_attr
+//   - span#browserActionState
+//   - span#browserActionTrack
+function initHtmlValues(key, id_attr) {
+    chrome.storage.local.get(key,
+        function(item) {
+            $(id_attr).html(item[key]);
         }
     );
 }
 
-// action for spam#browser_action_state
+///////////////
+// EXECUTION //
+///////////////
+
+// executes chrome.storage.onChanged.addListener 
 chrome.storage.onChanged.addListener(
     function(changes, areaName) {
-        var state_new = changes.state.newValue;
-        console.log('storage.onChanged#anon: ' + JSON.stringify(changes));
-        $("#browser_action_state").html(state_new);
+        console.log(JSON.stringify(changes));
+        if (changes.state != undefined) {
+            $("#browserActionState").html(
+                changes.state.newValue
+            );
+        } else if (changes.track != undefined) {
+            // false is string-casted to the empty string
+            var display = changes.track.newValue ? 'true' : 'false';
+            $("#browserActionTrack").html(display);
+        }
     }
 );
 
@@ -28,13 +55,16 @@ $(document).ready(
         console.log('$(document).ready call');
         
         // add onclick for button#toggleStateButton
-        $("#toggleStateButton").click(toggle_state_callback);
-
-        // initialise state
-        chrome.storage.local.get('state',
-            function(item) {
-                $("#browser_action_state").html(item.state);
-            }
+        $("#toggleStateButton").click(
+            toggleCallbackFactory("state", "rest", "work")
         );
+        // add onclick for button#toggleTrackButton
+        $("#toggleTrackButton").click(
+            toggleCallbackFactory("track", true, false)
+        );
+        
+        // initialise state of spans
+        initHtmlValues('state', '#browserActionState');
+        initHtmlValues('track', '#browserActionTrack');
     }
 );

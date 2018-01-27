@@ -1,5 +1,8 @@
-chrome.storage.local.set( { 'state': 'rest' } );  // default
-
+// set default values
+chrome.storage.local.set({ 
+        'state': 'rest',
+        'track': true
+});
 
 // TODO: are these sample code useful to us?
 // var settings = new Store("settings", {

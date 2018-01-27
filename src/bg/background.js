@@ -1,6 +1,4 @@
-var STATE_REST = 0;
-var STATE_WORK = 1;
-chrome.storage.local.set( {'state': STATE_REST} );  // default
+chrome.storage.local.set( { 'state': 'rest' } );  // default
 
 chrome.storage.onChanged.addListener(
     function(changes, areaName) {

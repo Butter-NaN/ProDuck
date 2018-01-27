@@ -1,7 +1,7 @@
 // set default values
 chrome.storage.local.set({ 
         'state': 'rest',
-        'track': true
+        'track': false
 });
 
 // TODO: are these sample code useful to us?

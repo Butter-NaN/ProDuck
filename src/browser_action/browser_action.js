@@ -52,8 +52,8 @@ function addTabCat(tab, state) {
     console.log(JSON.stringify(tabMap));
     setTimeout(function() {
         var replaceEntry = JSON.parse(JSON.stringify(tabMap));
-        replaceEntry[tab.id] = [];
-        replaceEntry[tab.id][0] = state;
+        replaceEntry[tab.id] = {};
+        replaceEntry[tab.id]["cat"] = state;
         chrome.storage.local.set({ 'tabMap' : replaceEntry });
     }, 500);
 }
@@ -102,7 +102,7 @@ function toggleTabMapPins() {
     setTimeout(function () {
         for (tab in tabMap) {
             // Unpin all in the current state
-            if (tab[0] === state) {
+            if (tab[0] == state) {
                 chrome.tabs.update(parseInt(tab), 
                                    {'pinned': false },
                                    function() {});

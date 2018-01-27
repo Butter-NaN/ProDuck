@@ -1,3 +1,4 @@
+// action for button#toggleStateButton
 function toggle_state_callback() {
     chrome.storage.local.get('state', 
         function(item) { 
@@ -13,8 +14,27 @@ function toggle_state_callback() {
     );
 }
 
-// action for button#toggleStateButton
-$(document).ready(function() {
-    console.log('$(document).ready call');
-    $("#toggleStateButton").click(toggle_state_callback);
-});
+// action for spam#browser_action_state
+chrome.storage.onChanged.addListener(
+    function(changes, areaName) {
+        var state_new = changes.state.newValue;
+        console.log('storage.onChanged#anon: ' + JSON.stringify(changes));
+        $("#browser_action_state").html(state_new);
+    }
+);
+
+$(document).ready(
+    function() { 
+        console.log('$(document).ready call');
+        
+        // add onclick for button#toggleStateButton
+        $("#toggleStateButton").click(toggle_state_callback);
+
+        // initialise state
+        chrome.storage.local.get('state',
+            function(item) {
+                $("#browser_action_state").html(item.state);
+            }
+        );
+    }
+);

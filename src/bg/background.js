@@ -17,3 +17,22 @@ chrome.storage.onChanged.addListener(
 //    sendResponse();
 //  });
 
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse){
+        switch(request.message){
+            case "startTimer":
+                console.log("Starting timer");
+                $("#startTime").text(request.time);
+                console.log("startTime set to " + $("#startTime").text());
+                break;
+            case "stopTimer":
+                console.log("Stopping timer");
+                $("#startTime").text(-1);
+                console.log("startTime reset to " + $("#startTime").text());
+                break;
+            default:
+                console.error("UNRECOGNISED MESSAGE to background.js");
+        }
+    }
+);

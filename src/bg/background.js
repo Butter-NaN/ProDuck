@@ -1,7 +1,8 @@
 // set default values
 chrome.storage.local.set({ 
         'state': 'rest',
-        'track': true
+        'track': true, 
+        'tabMap': {}
 });
 
 // TODO: are these sample code useful to us?

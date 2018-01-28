@@ -247,5 +247,8 @@ $(document).ready(
 
         //Start displaying state timer
         timer_loop();
+
+        // Show non tracking ui first
+        enableUiNonTrackingMode();
     }
 );

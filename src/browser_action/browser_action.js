@@ -56,6 +56,39 @@ function addTabCat(tab, state) {
     );
 }
 
+// Changes the tab Cat to the other cat 
+// i.e. change work to rest, vice versa
+// Set to current state by default
+function toggleTabCat(tab) {
+    chrome.storage.local.get('tabMap',
+        function(item) { 
+            var tabMap = item.tabMap; 
+            chrome.storage.local.get('state',
+                function(item) {
+                    state = item.state;
+                    console.log("current state:" + state);
+                    chrome.tabs.query({ 'active': true },
+                        function(tabs) {
+                            console.log(tabMap[String(tabs[0].id)]);
+                            // default if there is no tab
+                            // otherwise change the state
+                            if (tabMap[String(tabs[0].id)] == null) {
+                                tabMap[String(tabs[0].id)] = { "cat": state };
+                            } else {
+                                if (tabMap[String(tabs[0].id)]["cat"] == "work") {
+                                    tabMap[String(tabs[0].id)] = { "cat": "rest" };
+                                } else {
+                                    tabMap[String(tabs[0].id)] = { "cat": "work" };    
+                                }
+                            }
+                            chrome.storage.local.set( { 'tabMap': tabMap } );
+                        }
+                    );
+            });
+        }
+    );
+}
+
 // onclick function for #runMinimizerButton
 function toggleTabMapPins() {
     chrome.storage.local.get(['tabMap', 'state'],
@@ -145,6 +178,15 @@ $(document).ready(
                         state = item.state;
                         addActiveTabAs(state);
                     });
+            }
+        );
+        // add onclick for button#addTabMapButton
+        $("#toggleMapButton").click(
+            function() {
+                chrome.tabs.query( { 'active': true, 'currentWindow': true },
+                    function(tabs) {
+                        toggleTabCat(tabs[0]);
+                    }); 
             }
         );
         // add onclick for button#runMinimizerButton

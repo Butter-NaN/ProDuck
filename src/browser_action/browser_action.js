@@ -82,29 +82,36 @@ function toggleTabCat(tab) {
     console.log("toggleTabCat on " + JSON.stringify(tab));
     chrome.storage.local.get('tabMap',
         function(item) { 
+            console.log('toggleTabCat.anon: ' + JSON.stringify(item.tabMap));
             var tabMap = item.tabMap; 
             chrome.storage.local.get('state',
                 function(item) {
+                    console.log('toggleTabCat.anon: ' + JSON.stringify(item.state));
                     state = item.state;
                     console.log("current state:" + state);
                     chrome.tabs.query({ 'active': true },
                         function(tabs) {
+                            console.log('toggleTabCat.anon: ' + JSON.stringify(tabs));
                             console.log(tabMap[String(tabs[0].id)]);
                             // default if there is no tab
                             // otherwise change the state
                             if (tabMap[String(tabs[0].id)] == null) {
+                                console.log(' tab has no state');
                                 tabMap[String(tabs[0].id)] = { "cat": state };
                             } else {
                                 if (tabMap[String(tabs[0].id)]["cat"] == "work") {
+                                    console.log(' tab is on work. changing.');
                                     tabMap[String(tabs[0].id)] = { "cat": "rest" };
                                 } else {
+                                    console.log(' tab is on rest. changing.');
                                     tabMap[String(tabs[0].id)] = { "cat": "work" };    
                                 }
                             }
-                            chrome.storage.local.set( { 'tabMap': tabMap } );
+                            console.log("new tabMap is supposed to be " + JSON.stringify(tabMap));
                         }
                     );
             });
+            chrome.storage.local.set( { 'tabMap': tabMap } );
         }
     );
 }

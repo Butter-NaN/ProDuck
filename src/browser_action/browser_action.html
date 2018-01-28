@@ -17,16 +17,22 @@
 
 <div id="mainPopup">
     <div class="row">
-        <strong>State: </strong><span id='browserActionState'></span>
-        <span id="browserActionStateTimer"></span>
-        <br>
-        <strong>Track: </strong><span id='browserActionTrack'></span><br>
+        <span id='browserActionStateDisplay'>
+            <strong>State: </strong><span id='browserActionState'></span><br>
+            <span id="browserActionStateTimer"></span>
+        </span>
+        <span id='browserActionTrackDisplay' style='style="display:none;"'>
+            <strong>Track: </strong><span id='browserActionTrack'></span><br>
+        </span>
     </div>
     <div class="row">
         <button type="button" id="toggleStateButton">Toggle State</button>
     </div>
     <div class="row">
         <button type="button" id="toggleTrackButton">Toggle Track</button>
+    </div>
+    <div class="row">
+        <button type="button" id="toggleTabCategory">Toggle Tab Category</button>
     </div>
     <div class="row">
         <button type="button" id="addTabMapButon">Map the Tab (Testing)</button>

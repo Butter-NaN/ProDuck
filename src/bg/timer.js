@@ -1,5 +1,15 @@
 /*
 Timer:
+- timeRemaining(): 
+  - Returns time remaining till scheduled change in state, in milliseconds
+
+- timeRemainingString():
+  - Returns time remaining, in the format "12m 8s" 
+
+
+
+
+Internal details:
 - stores a variable "endTime" in chrome storage, which is an integer time
   in milliseconds since epoch that the current state is supposed to end at.
 
@@ -119,5 +129,26 @@ chrome.storage.onChanged.addListener(
         }
     }
 );
+
+// timeRemaining(callback) accepts a callback function(t) which processes
+//   the outputted time 't'. 
+function timeRemaining(callback){
+    chrome.storage.local.get("endTime", function(item){
+        var endTime = item.endTime;
+        var interval = endTime - $.now();
+        if (interval < 0) {
+            interval = 0;
+        }
+        callback(interval);
+    });
+}
+
+function timeRemainingString(callback){
+    timeRemaining(function(t){
+        var mins = Math.floor(t / 1000 / 60);
+        var secs = Math.floor(t / 1000 % 60);
+        callback(mins + "m " + secs + "s");
+    });
+}
 
 

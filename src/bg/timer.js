@@ -34,10 +34,10 @@ function resetState(){
 
         switch (state){
             case "work":
-                endTime = timeNow + 25 * MINUTE_MS;
+                endTime = timeNow + 0.2 * MINUTE_MS;
                 break;
             case "rest":
-                endTime = timeNow + 5 * MINUTE_MS;
+                endTime = timeNow + 0.1 * MINUTE_MS;
                 break;
             default:
                 console.error("Unknown value of 'state' in chrome.storage - "

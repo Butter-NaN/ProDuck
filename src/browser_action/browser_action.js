@@ -56,6 +56,25 @@ function addTabCat(tab, state) {
     );
 }
 
+function addAllTabCat() {
+    chrome.storage.local.get('tabMap',
+        function(item) { 
+            var tabMap = item.tabMap; 
+            chrome.tabs.query( {},
+                function(tabs) {
+                    // Do not overwrite tabs, but initialize tabs to work
+                    for(var i = 0; i < tabs.length; i ++) {
+                        if (tabMap[String(tabs[i].id)] == null) {
+                            tabMap[String(tabs[i].id)] = { "cat": "work" };
+                        } else {}
+                    }
+                    chrome.storage.local.set( { 'tabMap': tabMap } );
+                }
+            );
+        }
+    );
+}
+
 // Changes the tab Cat to the other cat 
 // i.e. change work to rest, vice versa
 // Set to current state by default
@@ -116,22 +135,33 @@ function toggleTabMapPins() {
     );
 }
 
-function addAllTabCat() {
-    chrome.storage.local.get('tabMap',
-        function(item) { 
-            var tabMap = item.tabMap; 
-            chrome.tabs.query( {},
-                function(tabs) {
-                    // Do not overwrite tabs, but initialize tabs to work
-                    for(var i = 0; i < tabs.length; i ++) {
-                        if (tabMap[String(tabs[i].id)] == null) {
-                            tabMap[String(tabs[i].id)] = { "cat": "work" };
-                        } else {}
-                    }
-                    chrome.storage.local.set( { 'tabMap': tabMap } );
-                }
-            );
-        }
+// Changes UI to show a "tracking" state:
+//     - Show state
+//     - Show status toggle buttons
+//     - Show "toggle tab category" menu
+//     - Change "toggle tracking" button to "stop tracking"
+function enableUiTrackingMode(){
+    console.log('enableUiTrackingMode'); 
+    $("#browserActionStateDisplay").show();
+    $("#toggleStateButton").show();
+    $("#toggleTabCategory").show();
+    $("#toggleTrackButton").html(
+       "Stop Tracking" 
+    );
+}
+
+// Changes UI to show a NON "tracking" state:
+//     - Hide state
+//     - Hide status toggle buttons
+//     - Hide "toggle tab category" menu
+//     - Change "stop tracking" button to "toggle tracking"
+function enableUiNonTrackingMode(){
+    console.log('enableUiNonTrackingMode'); 
+    $("#browserActionStateDisplay").hide();
+    $("#toggleStateButton").hide();
+    $("#toggleTabCategory").hide();
+    $("#toggleTrackButton").html(
+       "Start Tracking" 
     );
 }
 
@@ -155,6 +185,11 @@ chrome.storage.onChanged.addListener(
             // false is string-casted to the empty string
             var display = changes.track.newValue ? 'true' : 'false';
             $("#browserActionTrack").html(display);
+            if (changes.track.newValue) {
+                enableUiTrackingMode();
+            } else {
+                enableUiNonTrackingMode();
+            }
         }
     }
 );
@@ -185,7 +220,7 @@ $(document).ready(
             }
         );
         // add onclick for button#addTabMapButton
-        $("#toggleMapButton").click(
+        $("#toggleTabCategory").click(
             function() {
                 chrome.tabs.query( { 'active': true, 'currentWindow': true },
                     function(tabs) {

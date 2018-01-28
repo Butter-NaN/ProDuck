@@ -205,7 +205,7 @@ $(document).ready(
         // add onclick for button#toggleTrackButton
         $("#toggleTrackButton").click(
             function() {
-                toggleCallbackFactory("track", true, false);
+                toggleCallbackFactory("track", true, false)();
                 addAllTabCat();
             }
         );

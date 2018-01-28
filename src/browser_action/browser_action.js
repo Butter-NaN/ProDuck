@@ -71,14 +71,30 @@ function toggleTabMapPins() {
                 // note: tabMap.tabId.cat fails
                 if (tabMap[tabId].cat == state) {
                     chrome.tabs.update(
-                        Number(tabId), { 'pinned': false }, function() {}
+                        Number(tabId), { 'pinned': false, 'highlighted': true }, function() {}
                     );
                 } else {
                     chrome.tabs.update(
-                        Number(tabId), { 'pinned': true }, function() {}
+                        Number(tabId), { 'pinned': true, 'highlighted': false }, function() {}
                     );
                 }
             }
+        }
+    );
+}
+
+function addAllTabCat() {
+    chrome.storage.local.get('tabMap',
+        function(item) { 
+            var tabMap = item.tabMap; 
+            chrome.tabs.query( {},
+                function(tabs) {
+                    for(var i = 0; i < tabs.length; i ++) {
+                        tabMap[String(tabs[i].id)] = { "cat": "work" };
+                    }
+                    chrome.storage.local.set( { 'tabMap': tabMap } );
+                }
+            );
         }
     );
 }
@@ -113,7 +129,10 @@ $(document).ready(
         );
         // add onclick for button#toggleTrackButton
         $("#toggleTrackButton").click(
-            toggleCallbackFactory("track", true, false)
+            function() {
+                toggleCallbackFactory("track", true, false);
+                addAllTabCat();
+            }
         );
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(

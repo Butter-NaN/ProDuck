@@ -212,6 +212,7 @@ $(document).ready(
         // add onclick for button#toggleTabCategory
         $("#toggleTabCategory").click(
             // TODO Merge toggle tab category function
+
         );
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(
@@ -224,7 +225,7 @@ $(document).ready(
             }
         );
         // add onclick for button#addTabMapButton
-        $("#toggleMapButton").click(
+        $("#toggleTabCategory").click(
             function() {
                 chrome.tabs.query( { 'active': true, 'currentWindow': true },
                     function(tabs) {

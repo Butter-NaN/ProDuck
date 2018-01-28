@@ -83,6 +83,25 @@ function toggleTabMapPins() {
     );
 }
 
+function addAllTabCat() {
+    chrome.storage.local.get('tabMap',
+        function(item) { 
+            var tabMap = item.tabMap; 
+            chrome.tabs.query( {},
+                function(tabs) {
+                    // Do not overwrite tabs, but initialize tabs to work
+                    for(var i = 0; i < tabs.length; i ++) {
+                        if (tabMap[String(tabs[i].id)] == null) {
+                            tabMap[String(tabs[i].id)] = { "cat": "work" };
+                        } else {}
+                    }
+                    chrome.storage.local.set( { 'tabMap': tabMap } );
+                }
+            );
+        }
+    );
+}
+
 ///////////////
 // EXECUTION //
 ///////////////
@@ -113,7 +132,10 @@ $(document).ready(
         );
         // add onclick for button#toggleTrackButton
         $("#toggleTrackButton").click(
-            toggleCallbackFactory("track", true, false)
+            function() {
+                toggleCallbackFactory("track", true, false);
+                addAllTabCat();
+            }
         );
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(

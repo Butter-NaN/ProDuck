@@ -1,9 +1,4 @@
 // helpers
-function change_badge(text, colour) {
-    chrome.browserAction.setBadgeText( { 'text': text } );
-    chrome.browserAction.setBadgeBackgroundColor( { 'color': colour } );
-}
-
 function debug_storage() {
     chrome.storage.local.get(null,
         function(item) {
@@ -16,51 +11,61 @@ function debug_storage() {
     );
 }
 
+// set badge text and colour based on state
+// ACCEPTED ARGS state:
+//      null :null -> track == false
+//     'rest':str  -> track == true && state == 'rest'
+//     'work':str  -> track == true && state == 'work'
+function changeBadgeTo(state) {
+    var GREY, BLUE, ORANGE, INACTIVE_STR, REST_STR, WORK_STR;
+    GREY = '#8e8e8e', BLUE = '#008bb2', ORANGE = '#b25f00',
+    INACTIVE_STR = 'zZzZ', REST_STR = 'REST', WORK_STR = 'WORK';
+
+    if (state === null) {
+        change_badge(INACTIVE_STR, GREY);
+    } else if (state == 'rest') {
+        change_badge(REST_STR, BLUE);
+    } else if (state == 'work') {
+        change_badge(WORK_STR, ORANGE);
+    } else {}
+}
+
+function change_badge(text, colour) {
+    chrome.browserAction.setBadgeText( { 'text': text } );
+    chrome.browserAction.setBadgeBackgroundColor( { 'color': colour } );
+}
+
 // set default values
 chrome.storage.local.set({ 
         'state': 'rest',
         'track': false, 
         'tabMap': {}
 });
-change_badge('zZzZ', '#8e8e8e'); // GREY
+changeBadgeTo(null);
 
 // listeners
 chrome.storage.onChanged.addListener(
     function(changes, areaName) {
-        // changes.track
-        if (changes.track != undefined && changes.track.newValue) {
-            chrome.storage.local.get('state',
-                function(item) {
-                    var state = item.state
-                    state == 'rest'
-                        ? change_badge('REST', '#008bb2') /* BLUE */
-                        : change_badge('WORK', '#b25f00');// ORANGE
-                }
-            );
-        } else if (changes.track != undefined && !changes.track.newValue) {
-            change_badge('zZzZ', '#8e8e8e'); // GREY
-        } else if (changes.state != undefined) {
+        var isTrackChanged = changes.track != undefined;
+        var isStateChanged = changes.state != undefined;
+
+        if (isTrackChanged) {
+            changes.track.newValue
+                ? chrome.storage.local.get('state',
+                    function(item) {
+                        changeBadgeTo(item.state);
+                    }
+                ) : changeBadgeTo(null);
+        } else if (isStateChanged) {
             chrome.storage.local.get('track',
                 function(item) {
-                    if (item.track) {
-                        changes.state.newValue == 'rest'
-                            ? change_badge('REST', '#008bb2') /* BLUE */
-                            : change_badge('WORK', '#b25f00');// ORANGE
-                    } else {}
+                    item.track
+                        ? (changes.state.newValue == 'rest'
+                            ? changeBadgeTo('rest')
+                            : changeBadgeTo('work')
+                        ) : changeBadgeTo(null);
                 }
             );
         } else {}
     }
 );
-
-// TODO: are these sample code useful to us?
-// var settings = new Store("settings", {
-//     "sample_setting": "This is how you use Store.js to remember values"
-// });
-//example of using a message handler from the inject scripts
-//chrome.extension.onMessage.addListener(
-//  function(request, sender, sendResponse) {
-//  	chrome.pageAction.show(sender.tab.id);
-//    sendResponse();
-//  });
-

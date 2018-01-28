@@ -185,7 +185,7 @@ chrome.storage.onChanged.addListener(
             // false is string-casted to the empty string
             var display = changes.track.newValue ? 'true' : 'false';
             $("#browserActionTrack").html(display);
-            if (changes.track.newValue) {
+            if (display == 'true') {
                 enableUiTrackingMode();
             } else {
                 enableUiNonTrackingMode();

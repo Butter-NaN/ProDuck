@@ -75,7 +75,7 @@ function toggleState(){
    });
 }
 
-// Refreshes itself every 5 seconds, checking if timer has elapsed; if 
+// Refreshes itself every second, checking if timer has elapsed; if 
 //   so then call toggleState() (and thereby resetState()).
 function looper(){
     timeout_id = -1;
@@ -87,6 +87,26 @@ function looper(){
         var minutes = Math.floor((endTime - timeNow) / 1000 / 60);
         var seconds = Math.floor((endTime - timeNow) / 1000 % 60);
         console.log(minutes + "m " + seconds + "s remaining");
+
+        //Update browser action badge
+        var t = Math.floor((endTime - timeNow)/1000);
+        var mins = Math.floor(t/60);
+        var secs = t % 60;
+        secs = String(secs); mins = String(mins)
+        secs = secs.length < 2 ? '0' + secs : secs;
+        mins = mins.length < 2 ? '0' + mins : mins;
+        var timestring = mins + ':' + secs;
+        chrome.storage.local.get('state',
+                function(item) {
+                var color = item.state == 'rest'
+                ? "#008bb2" : "#b25f00";
+                chrome.browserAction.setBadgeText( { 'text': timestring } );
+                chrome.browserAction.setBadgeBackgroundColor( { 'color': color } );
+                }
+                );
+
+
+
 
         if (timeNow > endTime){
             toggleState();

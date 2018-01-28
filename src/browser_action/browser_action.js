@@ -194,6 +194,16 @@ chrome.storage.onChanged.addListener(
     }
 );
 
+// Add a new tab listener
+chrome.tabs.onCreated.addListener(
+    function(tab) {
+        chrome.storage.local.get('state',
+            function(item) {
+                state = item.state;
+                addTabCat(tab, state);
+            });
+})
+
 $(document).ready(
     function() { 
         console.log('$(document).ready call');

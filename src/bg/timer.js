@@ -6,21 +6,15 @@ Timer:
 - Provides function resetState(), which resets the duration of the current state
 
 - Provides function toggleState(), which toggles the current state
-
-- Provides function finishState(), which toggles state then calls resetState().
-
-- 
-
+  - When state is toggled, endTime is also automatically reset
 
 */
 
+//Stores the id of the currently active timeout, to facilitate cancelling
 var timeout_id = -1;
 
+// Resets the duration of a state to its full duration
 function resetState(){
-    return __resetState(function(){});
-}
-
-function __resetState(doNext){
     console.log("Resetting state: ");
     chrome.storage.local.get("state", function(item){
         var state = item.state;
@@ -45,24 +39,17 @@ function __resetState(doNext){
         chrome.storage.local.set({"endTime": endTime});
         
         chrome.storage.local.get("endTime", function(item){
-                console.log("Intended endTime: " + endTime);
-                console.log("chrome.storage's endTime: " + item.endTime);
-                console.log("chrome.storage endTime write successful?");
-                console.log(endTime === item.endTime);
-
-
-                //KEEP THIS AT THE INNERMOST ASYNC
-                doNext();
+                console.log("chrome.storage endTime write "
+                    + (endTime === item.endTime?"success":"FAILURE"));
             }
         );
     });
 }
 
+// Toggles state between 'work' and 'rest'
+// Due to Listener checking for changes in state, this automatically resets
+//   duration of state as well when called.
 function toggleState(){
-    return __toggleState(function(){});
-}
-
-function __toggleState(doNext){
    console.log("Toggling state:");
    chrome.storage.local.get("state", function(item){
         var state = item.state;
@@ -73,25 +60,13 @@ function __toggleState(doNext){
         chrome.storage.local.get("state", function(item){
                 var state = item.state;
                 console.log("New state is: " + state);
-
-                //KEEP THIS AT THE INNERMOST ASYNC
-                doNext();
             }
         );
    });
 }
 
-function finishState(){
-    return __finishState(function(){});
-}
-
-function __finishState(doNext){
-    __toggleState(function(){__resetState(doNext);});
-}
-
-
-// Refreshes itself every 5 seconds to check if timer has elapsed; if 
-//   so then call finishState().
+// Refreshes itself every 5 seconds, checking if timer has elapsed; if 
+//   so then call toggleState() (and thereby resetState()).
 function looper(){
     timeout_id = -1;
     console.log("Looping");
@@ -104,29 +79,28 @@ function looper(){
         console.log(minutes + "m " + seconds + "s remaining");
 
         if (timeNow > endTime){
-            //finishState();
             toggleState();
-
-            //Need to notify people that state has changed?
-            //Probably not; there's already a listener
-            
         } 
         
+        // Keep track of timeout id, to facilitate cancelling
         timeout_id = setTimeout(looper, 1000);
     });
 }
 
-
-// executes chrome.storage.onChanged.addListener
+// Listen for changes in chrome.storage, and update accordingly
 chrome.storage.onChanged.addListener(
     function(changes, areaName) {
         console.log(JSON.stringify(changes));
 
+        // If state has changed for any reason, reset duration
         if (changes.state != undefined) {
             console.log("'state' has been changed, resetting stopTime");
             resetState();
 
-        } else if (changes.track != undefined) {
+        } 
+        
+        // If inactive, stop checking for time exceeded.
+        if (changes.track != undefined) {
             // "track" has changed
             if (changes.track.newValue){
                 // i.e., user are now tracking
@@ -145,3 +119,5 @@ chrome.storage.onChanged.addListener(
         }
     }
 );
+
+

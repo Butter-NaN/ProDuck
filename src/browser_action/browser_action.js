@@ -71,11 +71,11 @@ function toggleTabMapPins() {
                 // note: tabMap.tabId.cat fails
                 if (tabMap[tabId].cat == state) {
                     chrome.tabs.update(
-                        Number(tabId), { 'pinned': false, 'highlighted': true }, function() {}
+                        Number(tabId), { 'pinned': false }, function() {}
                     );
                 } else {
                     chrome.tabs.update(
-                        Number(tabId), { 'pinned': true, 'highlighted': false }, function() {}
+                        Number(tabId), { 'pinned': true }, function() {}
                     );
                 }
             }
@@ -89,8 +89,11 @@ function addAllTabCat() {
             var tabMap = item.tabMap; 
             chrome.tabs.query( {},
                 function(tabs) {
+                    // Do not overwrite tabs, but initialize tabs to work
                     for(var i = 0; i < tabs.length; i ++) {
-                        tabMap[String(tabs[i].id)] = { "cat": "work" };
+                        if (tabMap[String(tabs[i].id)] == null) {
+                            tabMap[String(tabs[i].id)] = { "cat": "work" };
+                        } else {}
                     }
                     chrome.storage.local.set( { 'tabMap': tabMap } );
                 }

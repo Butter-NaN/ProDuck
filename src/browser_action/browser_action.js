@@ -210,7 +210,10 @@ $(document).ready(
         
         // add onclick for button#toggleStateButton
         $("#toggleStateButton").click(
-            toggleCallbackFactory("state", "rest", "work")
+            function() {
+                toggleCallbackFactory("state", "rest", "work")();
+                toggleTabMapPins();
+            }
         );
         // add onclick for button#toggleTrackButton
         $("#toggleTrackButton").click(

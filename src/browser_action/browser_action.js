@@ -79,6 +79,7 @@ function addAllTabCat() {
 // i.e. change work to rest, vice versa
 // Set to current state by default
 function toggleTabCat(tab) {
+    console.log("toggleTabCat on " + JSON.stringify(tab));
     chrome.storage.local.get('tabMap',
         function(item) { 
             var tabMap = item.tabMap; 
@@ -208,11 +209,6 @@ $(document).ready(
                 toggleCallbackFactory("track", true, false);
                 addAllTabCat();
             }
-        );
-        // add onclick for button#toggleTabCategory
-        $("#toggleTabCategory").click(
-            // TODO Merge toggle tab category function
-
         );
         // add onclick for button#addTabMapButton
         $("#addTabMapButon").click(

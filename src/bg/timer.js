@@ -13,6 +13,9 @@ Timer:
 
 
 */
+
+var timeout_id = -1;
+
 function resetState(){
     return __resetState(function(){});
 }
@@ -90,6 +93,7 @@ function __finishState(doNext){
 // Refreshes itself every 5 seconds to check if timer has elapsed; if 
 //   so then call finishState().
 function looper(){
+    timeout_id = -1;
     console.log("Looping");
 
     chrome.storage.local.get("endTime", function(item){
@@ -100,13 +104,44 @@ function looper(){
         console.log(minutes + "m " + seconds + "s remaining");
 
         if (timeNow > endTime){
-            finishState();
+            //finishState();
+            toggleState();
+
             //Need to notify people that state has changed?
             //Probably not; there's already a listener
             
         } 
         
-        setTimeout(looper, 5000);
+        timeout_id = setTimeout(looper, 1000);
     });
 }
 
+
+// executes chrome.storage.onChanged.addListener
+chrome.storage.onChanged.addListener(
+    function(changes, areaName) {
+        console.log(JSON.stringify(changes));
+
+        if (changes.state != undefined) {
+            console.log("'state' has been changed, resetting stopTime");
+            resetState();
+
+        } else if (changes.track != undefined) {
+            // "track" has changed
+            if (changes.track.newValue){
+                // i.e., user are now tracking
+                console.log("Beginning to track");
+                looper();
+            } else {
+                // No longer being tracked
+                console.log("Stopping tracking");
+
+                //Clear existing timeout
+                if (timeout_id != -1) {
+                    clearTimeout(timeout_id);
+                    timeout_id = -1;
+                }
+            }
+        }
+    }
+);

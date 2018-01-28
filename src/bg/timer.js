@@ -85,3 +85,28 @@ function finishState(){
 function __finishState(doNext){
     __toggleState(function(){__resetState(doNext);});
 }
+
+
+// Refreshes itself every 5 seconds to check if timer has elapsed; if 
+//   so then call finishState().
+function looper(){
+    console.log("Looping");
+
+    chrome.storage.local.get("endTime", function(item){
+        var endTime = item.endTime;
+        var timeNow = $.now();
+        var minutes = Math.floor((endTime - timeNow) / 1000 / 60);
+        var seconds = Math.floor((endTime - timeNow) / 1000 % 60);
+        console.log(minutes + "m " + seconds + "s remaining");
+
+        if (timeNow > endTime){
+            finishState();
+            //Need to notify people that state has changed?
+            //Probably not; there's already a listener
+            
+        } 
+        
+        setTimeout(looper, 5000);
+    });
+}
+

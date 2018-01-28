@@ -135,8 +135,11 @@ chrome.storage.onChanged.addListener(
 function timeRemaining(callback){
     chrome.storage.local.get("endTime", function(item){
         var endTime = item.endTime;
-        console.log("Time remaining: " + (endTime - $.now()));
-        callback(endTime - $.now());
+        var interval = endTime - $.now();
+        if (interval < 0) {
+            interval = 0;
+        }
+        callback(interval);
     });
 }
 

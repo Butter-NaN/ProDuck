@@ -114,6 +114,10 @@ chrome.storage.onChanged.addListener(
             $("#browserActionState").html(
                 changes.state.newValue
             );
+
+            //Update state timer immediately when state is changed
+            timeRemainingString(update_time);
+
         } else if (changes.track != undefined) {
             // false is string-casted to the empty string
             var display = changes.track.newValue ? 'true' : 'false';
@@ -153,5 +157,8 @@ $(document).ready(
         // initialise state of spans
         initHtmlValues('state', '#browserActionState');
         initHtmlValues('track', '#browserActionTrack');
+
+        //Start displaying state timer
+        timer_loop();
     }
 );
